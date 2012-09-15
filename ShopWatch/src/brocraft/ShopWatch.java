@@ -14,4 +14,9 @@ public class ShopWatch extends JavaPlugin {
         // TODO Insert logic to be performed when the plugin is disabled
     	getLogger().info("ShopWatch has been disabled!");
     }
+    
+    public void sendToDatabase(String shopOwnerName, int transactionValue) {
+    	getLogger().info("LOG: Player: " + shopOwnerName + " has received: " + transactionValue + " currency!");
+    }
+
 }
