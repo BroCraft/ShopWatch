@@ -7,7 +7,9 @@ import com.Acrobot.ChestShop.Events.TransactionEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent.Type;
 
 public class ShopListener implements EventListener {
+	
 	ShopWatch parent;
+	
 	public ShopListener(ShopWatch parent){
 		this.parent = parent;
 	}

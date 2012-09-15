@@ -11,10 +11,13 @@ import brocraft.ShopWatch;
 import com.Acrobot.ChestShop.Events.TransactionEvent;
 
 public class LoginListener implements EventListener {
+	
 	ShopWatch parent;
+	
 	public LoginListener(ShopWatch parent){
 		this.parent = parent;
 	}
+	
 	public void eventPerformed(Event e) {
 		PlayerJoinEvent joinedEvent;
 		if (e instanceof PlayerJoinEvent){
@@ -23,6 +26,7 @@ public class LoginListener implements EventListener {
 			return;
 		}
 		Player joiner = joinedEvent.getPlayer();
-		joiner.getName();
+		String joinerName = joiner.getName();
+		parent.playerLoggedIn(joinerName);
 	}
 }

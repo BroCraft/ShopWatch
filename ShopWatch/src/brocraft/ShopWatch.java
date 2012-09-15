@@ -27,7 +27,7 @@ public class ShopWatch extends JavaPlugin {
     }
     
     private void notifyPlayerOfTransactions(String player){
-    	//Get transactions, inform player
+    	getLogger().info("LOG: Player: " + player + "has logged in!");
     }
 
 }
