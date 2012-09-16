@@ -7,6 +7,7 @@ import java.util.List;
 
 import listeners.*;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import data.DatabaseConnector;
 import data.SWDataClass;
@@ -37,6 +38,9 @@ public class ShopWatch extends JavaPlugin {
 		ShopListener SL = new ShopListener(this);
 		LoginListener LL = new LoginListener(this);
 		getLogger().info("ShopWatch has been enabled!");
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(SL, this);
+		pm.registerEvents(LL, this);
 
 	}
 
