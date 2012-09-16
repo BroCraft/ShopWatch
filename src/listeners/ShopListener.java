@@ -3,10 +3,12 @@ package listeners;
 import java.util.EventListener;
 import brocraft.*;
 import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
+
 import com.Acrobot.ChestShop.Events.TransactionEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent.Type;
 
-public class ShopListener implements EventListener {
+public class ShopListener implements Listener {
 	
 	ShopWatch parent;
 	
@@ -14,16 +16,10 @@ public class ShopListener implements EventListener {
 		this.parent = parent;
 	}
 
-	public void eventPerformed(Event e) {
-		TransactionEvent transaction;
-		if(e instanceof TransactionEvent){
-			transaction = (TransactionEvent) e;
-		} else {
-			return;
-		}
-		String owner = transaction.getOwner();
-		Double price = transaction.getPrice();
-		if(transaction.getTransactionType() == Type.SELL){
+	public void eventPerformed(TransactionEvent e) {
+		String owner = e.getOwner();
+		Double price = e.getPrice();
+		if(e.getTransactionType() == Type.SELL){
 			price *= -1.0;
 		}
 		parent.sendToDatabase(owner, price);
