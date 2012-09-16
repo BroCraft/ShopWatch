@@ -1,4 +1,4 @@
-package brocraft;
+package data;
 
 public class Transaction {
 	private int id;
@@ -6,6 +6,11 @@ public class Transaction {
 	private int value;
 	private boolean read;
 	
+	public Transaction(String playerName, int value) {
+		this.playerName = playerName;
+		this.value = value;
+		this.read = false;
+	}
 	/**
 	 * @return the playerName
 	 */
