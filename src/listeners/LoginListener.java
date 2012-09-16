@@ -1,16 +1,14 @@
 package listeners;
 
-import java.util.EventListener;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
+import org.bukkit.event.player.PlayerLoginEvent;
 import brocraft.ShopWatch;
 
-import com.Acrobot.ChestShop.Events.TransactionEvent;
 
-public class LoginListener implements EventListener {
+public class LoginListener implements Listener {
 	
 	ShopWatch parent;
 	
@@ -18,14 +16,8 @@ public class LoginListener implements EventListener {
 		this.parent = parent;
 	}
 	
-	public void eventPerformed(Event e) {
-		PlayerJoinEvent joinedEvent;
-		if (e instanceof PlayerJoinEvent){
-			joinedEvent = (PlayerJoinEvent) e;
-		} else {
-			return;
-		}
-		Player joiner = joinedEvent.getPlayer();
+	public void eventPerformed(PlayerLoginEvent e) {
+		Player joiner = e.getPlayer();
 		String joinerName = joiner.getName();
 		parent.playerLoggedIn(joinerName);
 	}
