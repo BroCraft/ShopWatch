@@ -2,6 +2,7 @@ package brocraft;
 
 import listeners.*;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,7 +32,8 @@ public class ShopWatch extends JavaPlugin {
     }
     
     private void notifyPlayerOfTransactions(String player){
-    	getLogger().info("LOG: Player: " + player + "has logged in!");
+    	getLogger().info("LOG: Player: " + player + " has logged in!");
+    	Bukkit.getPlayer(player).sendMessage("Hello " + player + "! Thanks for Logging in!");
     }
 
 }

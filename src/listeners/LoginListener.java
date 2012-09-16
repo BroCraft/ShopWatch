@@ -18,7 +18,7 @@ public class LoginListener implements Listener {
 	}
 	
 	@EventHandler
-	public void eventPerformed(PlayerLoginEvent e) {
+	public void eventPerformed(PlayerJoinEvent e) {
 		Player joiner = e.getPlayer();
 		String joinerName = joiner.getName();
 		parent.playerLoggedIn(joinerName);
