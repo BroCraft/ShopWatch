@@ -21,25 +21,41 @@ public class ShopWatch extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		File dbFile = new File(DatabaseConnector.SAVE_FILE_NAME);
+		File dbFile = new File(DatabaseConnector.SAVE_FILE_DIR + "\\" + DatabaseConnector.SAVE_FILE_NAME);
+		
+		swDataClass = new SWDataClass();
+		// Check if database file exists
 		if (!dbFile.exists()) {
+			// No file, so set one up
 			getLogger().info("No database file found! Creating a new file.");
 			try {
+				// Create the directories for ShopWatch
+				File dirs = new File(DatabaseConnector.SAVE_FILE_DIR);
+				dirs.mkdirs();
+				
+				// Create the save file
+				dirs.createNewFile();
 				dbFile.createNewFile();
+				
+				// Notify the logger
 				getLogger().info("File created successfully.");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			swDataClass = new SWDataClass();
+			DatabaseConnector.saveTransactions(swDataClass);
 		} else {
 			DatabaseConnector.loadTransactions(swDataClass);
 		}
+		
+		// 
 		ShopListener SL = new ShopListener(this);
 		LoginListener LL = new LoginListener(this);
-		getLogger().info("ShopWatch has been enabled!");
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(SL, this);
 		pm.registerEvents(LL, this);
+		
+		// We made it! Output a successful load.
+		getLogger().info("ShopWatch has been enabled!");
 
 	}
 
