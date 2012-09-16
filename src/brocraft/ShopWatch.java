@@ -53,29 +53,60 @@ public class ShopWatch extends JavaPlugin {
 	public void sendToDatabase(String shopOwnerName, double transactionValue) {
 		addTransaction(shopOwnerName, transactionValue);
 	}
-
+	
+	/**
+	 * This method will perform all the necessary operations that occur when a player logs in
+	 * For now this is
+	 * 1.How Much money he/she made/lost while they were offline
+	 * ~2. Which shops are empty (Future)
+	 * @param player
+	 */
 	public void playerLoggedIn(String player) {
 		notifyPlayerOfTransactions(player);
 	}
 
+	
+	/**
+	 * Notifys the player of how much money they made/lost while they were offline
+	 * @param player
+	 */
 	private void notifyPlayerOfTransactions(String player) {
-		int netTransactions = this.getTransactions(player);
-		getLogger().info("LOG: Player: " + player + "has logged in!");
+		//First, calculate how much the player made since he logged off last
+		double netTransactions = this.getTransactions(player);
+		//get the player
 		Player p = Bukkit.getPlayer(player);
+		//tell them how much they made
 		p.sendMessage("Welcome Back " + player + "!/nYou have made " + netTransactions +" dollars since you last logged off!");
 	}
 
+	/**
+	 * Adds a transaction to the database
+	 * @param playerName the name of the player who owns the shop
+	 * @param value the value of the transaction that is being added
+	 */
 	private void addTransaction(String playerName, double value) {
+		//create a new transaction
 		Transaction t = new Transaction(playerName, value);
+		//add the transaction to the dataClass
 		swDataClass.getTransactions().add(t);
+		//make sure the database saves the fucking transactions
 		DatabaseConnector.saveTransactions(swDataClass);
 	}
 
-	private int getTransactions(String player) {
-		int runningTotal = 0;
+	/**
+	 * Totals up all of the transactions that have occured since the players last login
+	 * @param player
+	 * @return the total value of all transactions that occured while the player was logged off
+	 */
+	private double getTransactions(String player) {
+		//create a running total
+		double runningTotal = 0;
+		//get all the transactions
 		List<Transaction> transactions = swDataClass.getTransactions();
+		//create an iterator for the transactons
 		Iterator<Transaction> transactionIterator = transactions.iterator();
-
+		//for each transaction in the list, check the owner. if it matches the player
+		//that just logged in, add it to the running total and delete it from the list
 		while (transactionIterator.hasNext()) {
 			Transaction t = transactionIterator.next();
 			if (t.getPlayerName().equals(player)) {
