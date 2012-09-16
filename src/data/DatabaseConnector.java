@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import org.bukkit.Bukkit;
 
 public class DatabaseConnector {
 	public static final String SAVE_FILE_NAME = "SWSaveFile.sav";
@@ -54,7 +55,7 @@ public class DatabaseConnector {
 			save.close(); // This also closes saveFile.
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
