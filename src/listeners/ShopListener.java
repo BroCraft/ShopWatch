@@ -3,6 +3,7 @@ package listeners;
 import java.util.EventListener;
 import brocraft.*;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import com.Acrobot.ChestShop.Events.TransactionEvent;
@@ -16,6 +17,7 @@ public class ShopListener implements Listener {
 		this.parent = parent;
 	}
 
+	@EventHandler
 	public void eventPerformed(TransactionEvent e) {
 		String owner = e.getOwner();
 		Double price = e.getPrice();
