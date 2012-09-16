@@ -7,6 +7,8 @@ import java.util.List;
 
 import listeners.*;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import data.DatabaseConnector;
@@ -28,13 +30,10 @@ public class ShopWatch extends JavaPlugin {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 			swDataClass = new SWDataClass();
 		} else {
 			DatabaseConnector.loadTransactions(swDataClass);
-
 		}
-
 		ShopListener SL = new ShopListener(this);
 		LoginListener LL = new LoginListener(this);
 		getLogger().info("ShopWatch has been enabled!");
@@ -52,9 +51,7 @@ public class ShopWatch extends JavaPlugin {
 	}
 
 	public void sendToDatabase(String shopOwnerName, double transactionValue) {
-		getLogger().info(
-				"LOG: Player: " + shopOwnerName + " has received: "
-						+ transactionValue + " currency!");
+		addTransaction(shopOwnerName, transactionValue);
 	}
 
 	public void playerLoggedIn(String player) {
@@ -63,11 +60,12 @@ public class ShopWatch extends JavaPlugin {
 
 	private void notifyPlayerOfTransactions(String player) {
 		int netTransactions = this.getTransactions(player);
-
 		getLogger().info("LOG: Player: " + player + "has logged in!");
+		Player p = Bukkit.getPlayer(player);
+		p.sendMessage("Welcome Back " + player + "!/nYou have made " + netTransactions +" dollars since you last logged off!");
 	}
 
-	private void addTransaction(String playerName, int value) {
+	private void addTransaction(String playerName, double value) {
 		Transaction t = new Transaction(playerName, value);
 		swDataClass.getTransactions().add(t);
 		DatabaseConnector.saveTransactions(swDataClass);
@@ -80,13 +78,11 @@ public class ShopWatch extends JavaPlugin {
 
 		while (transactionIterator.hasNext()) {
 			Transaction t = transactionIterator.next();
-
-			if (t.isRead() == false && t.getPlayerName().equals(player)) {
+			if (t.getPlayerName().equals(player)) {
 				runningTotal += t.getValue();
-				t.setRead(true);
+				swDataClass.getTransactions().remove(t);
 			}
 		}
-
 		return runningTotal;
 	}
 

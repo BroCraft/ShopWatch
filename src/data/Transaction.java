@@ -3,10 +3,10 @@ package data;
 public class Transaction {
 	private int id;
 	private String playerName;
-	private int value;
+	private double value;
 	private boolean read;
 	
-	public Transaction(String playerName, int value) {
+	public Transaction(String playerName, double value) {
 		this.playerName = playerName;
 		this.value = value;
 		this.read = false;
@@ -26,7 +26,7 @@ public class Transaction {
 	/**
 	 * @return the value
 	 */
-	public int getValue() {
+	public double getValue() {
 		return value;
 	}
 	/**

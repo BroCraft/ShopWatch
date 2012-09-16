@@ -2,6 +2,8 @@ package listeners;
 
 import java.util.EventListener;
 import brocraft.*;
+
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +22,9 @@ public class ShopListener implements Listener {
 	@EventHandler
 	public void eventPerformed(TransactionEvent e) {
 		String owner = e.getOwner();
+		if(Bukkit.getPlayer(owner).isOnline()){
+			return;
+		}
 		Double price = e.getPrice();
 		if(e.getTransactionType() == Type.SELL){
 			price *= -1.0;
