@@ -134,8 +134,8 @@ public class DatabaseConfig {
 
 	}
 
-	public String getParameter(Parameter param) {
-		return config.get(param);
+	public String getParameter(lib.PatPeter.SQLibrary.DatabaseConfig.Parameter hostname) {
+		return config.get(hostname);
 	}
 
 	public boolean isValid() throws InvalidConfiguration {
