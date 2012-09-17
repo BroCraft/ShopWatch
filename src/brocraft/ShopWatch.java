@@ -111,21 +111,21 @@ public class ShopWatch extends JavaPlugin {
 	 * Notifies the player of how much money they made/lost while they were
 	 * offline
 	 * 
-	 * @param player
+	 * @param playerName
 	 */
-	private void notifyPlayerOfTransactions(String player) {
+	private void notifyPlayerOfTransactions(String playerName) {
 		// First, calculate how much the player made since he logged off last
 		double netTransactions = 0;
 		try {
-			netTransactions = this.getTransactions(player);
+			netTransactions = this.getTransactions(playerName);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		// get the player
-		Player pplayer = Bukkit.getPlayer(player);
+		Player player = Bukkit.getPlayer(playerName);
 		// tell them how much they made
-		pplayer.sendMessage("Welcome Back " + player + "!\nYou have made "
+		player.sendMessage("Welcome Back " + playerName + "!\nYou have made "
 				+ netTransactions + " dollars while you were offline!");
 	}
 
