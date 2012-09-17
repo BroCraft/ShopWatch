@@ -15,14 +15,30 @@ import data.DatabaseConnector;
 import data.SWDataClass;
 import data.Transaction;
 
+/**
+ * Main driver class and controller for the ShopWatch plugin. Contains the logic
+ * for interacting with the model (database) and views (player window and server
+ * console)
+ * 
+ * @author SudoCheese
+ * @author Ampt
+ * 
+ */
 public class ShopWatch extends JavaPlugin {
 
+	/**
+	 * Used to store the transactions data structure in memory for quick access
+	 */
 	private SWDataClass swDataClass;
 
+	/**
+	 * This methods takes care of initializing the database and listeners.
+	 */
 	@Override
 	public void onEnable() {
-		File dbFile = new File(DatabaseConnector.SAVE_FILE_DIR + "\\" + DatabaseConnector.SAVE_FILE_NAME);
-		
+		File dbFile = new File(DatabaseConnector.SAVE_FILE_DIRECTORY + "\\"
+				+ DatabaseConnector.SAVE_FILE_NAME);
+
 		swDataClass = new SWDataClass();
 		// Check if database file exists
 		if (!dbFile.exists()) {
@@ -30,13 +46,14 @@ public class ShopWatch extends JavaPlugin {
 			getLogger().info("No database file found! Creating a new file.");
 			try {
 				// Create the directories for ShopWatch
-				File dirs = new File(DatabaseConnector.SAVE_FILE_DIR);
-				dirs.mkdirs();
-				
+				File directories = new File(
+						DatabaseConnector.SAVE_FILE_DIRECTORY);
+				directories.mkdirs();
+
 				// Create the save file
-				dirs.createNewFile();
+				directories.createNewFile();
 				dbFile.createNewFile();
-				
+
 				// Notify the logger
 				getLogger().info("File created successfully.");
 			} catch (IOException e) {
@@ -46,89 +63,115 @@ public class ShopWatch extends JavaPlugin {
 		} else {
 			DatabaseConnector.loadTransactions(swDataClass);
 		}
-		
-		// 
-		ShopListener SL = new ShopListener(this);
-		LoginListener LL = new LoginListener(this);
-		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvents(SL, this);
-		pm.registerEvents(LL, this);
-		
-		// We made it! Output a successful load.
+
+		// Set up listeners
+		ShopListener shopListener = new ShopListener(this);
+		LoginListener loginListener = new LoginListener(this);
+		PluginManager pluginManager = getServer().getPluginManager();
+		pluginManager.registerEvents(shopListener, this);
+		pluginManager.registerEvents(loginListener, this);
+
+		// We made it! Output a happy message.
 		getLogger().info("ShopWatch has been enabled!");
 
 	}
 
+	/**
+	 * Saves the database to disk (again) for good luck in the event that we are
+	 * reloading or something fancy
+	 */
 	@Override
-	public void onDisable(){
+	public void onDisable() {
 		// TODO Insert logic to be performed when the plugin is disabled
 		DatabaseConnector.saveTransactions(swDataClass);
 		getLogger().info("ShopWatch has been disabled!");
 	}
 
+	/**
+	 * Saves a transaction to the database
+	 * @param shopOwnerName - The owner of the shop
+	 * @param transactionValue - The value of the transaction
+	 */
 	public void sendToDatabase(String shopOwnerName, double transactionValue) {
 		addTransaction(shopOwnerName, transactionValue);
 	}
-	
+
 	/**
-	 * This method will perform all the necessary operations that occur when a player logs in
-	 * For now this is
-	 * 1.How Much money he/she made/lost while they were offline
-	 * ~2. Which shops are empty (Future)
-	 * @param player
+	 * This method will perform all the necessary operations that occur when a
+	 * player logs in For now this is 1 - Net currency made/lost while offline
+	 * ~2. Which shops went empty while offline (future)
+	 * 
+	 * @param player - Name of the player that just logged in
 	 */
 	public void playerLoggedIn(String player) {
 		notifyPlayerOfTransactions(player);
 	}
 
-	
 	/**
-	 * Notifys the player of how much money they made/lost while they were offline
+	 * Notifies the player of how much money they made/lost while they were
+	 * offline
+	 * 
 	 * @param player
 	 */
 	private void notifyPlayerOfTransactions(String player) {
-		//First, calculate how much the player made since he logged off last
-		double netTransactions = this.getTransactions(player);
-		//get the player
-		Player p = Bukkit.getPlayer(player);
-		//tell them how much they made
-		p.sendMessage("Welcome Back " + player + "!/nYou have made " + netTransactions +" dollars since you last logged off!");
+		// First, calculate how much the player made since he logged off last
+		double netTransactions = 0;
+		try {
+			netTransactions = this.getTransactions(player);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// get the player
+		Player pplayer = Bukkit.getPlayer(player);
+		// tell them how much they made
+		pplayer.sendMessage("Welcome Back " + player + "!\nYou have made "
+				+ netTransactions + " dollars while you were offline!");
 	}
 
 	/**
 	 * Adds a transaction to the database
-	 * @param playerName the name of the player who owns the shop
-	 * @param value the value of the transaction that is being added
+	 * 
+	 * @param playerName - name of the player who owns the shop
+	 * @param value - value of the transaction that is being added
 	 */
 	private void addTransaction(String playerName, double value) {
-		//create a new transaction
+		// create a new transaction
 		Transaction t = new Transaction(playerName, value);
-		//add the transaction to the dataClass
+		// add the transaction to the dataClass
 		swDataClass.getTransactions().add(t);
-		//make sure the database saves the fucking transactions
+
 		DatabaseConnector.saveTransactions(swDataClass);
 	}
 
 	/**
-	 * Totals up all of the transactions that have occured since the players last login
+	 * Totals up all of the transactions that have occurred since the players
+	 * last login
+	 * 
 	 * @param player
-	 * @return the total value of all transactions that occured while the player was logged off
+	 * @return the total value of all transactions that occurred while the player
+	 *         was logged off
 	 */
 	private double getTransactions(String player) {
-		//create a running total
+		boolean removedRecords = false;
+		// create a running total
 		double runningTotal = 0;
-		//get all the transactions
+		// get all the transactions
 		List<Transaction> transactions = swDataClass.getTransactions();
-		//create an iterator for the transactons
+		// create an iterator for the transactions
 		Iterator<Transaction> transactionIterator = transactions.iterator();
-		//for each transaction in the list, check the owner. if it matches the player
-		//that just logged in, add it to the running total and delete it from the list
 		while (transactionIterator.hasNext()) {
 			Transaction t = transactionIterator.next();
-			if (t.getPlayerName().equals(player)) {
+			if (t.getPlayerName().equalsIgnoreCase(player)) {
 				runningTotal += t.getValue();
-				swDataClass.getTransactions().remove(t);
+				transactionIterator.remove();
+				removedRecords = true;
 			}
+		}
+		
+		// If we removed any records from the database, we need to save it again
+		if (removedRecords) {
+			DatabaseConnector.saveTransactions(swDataClass);
 		}
 		return runningTotal;
 	}

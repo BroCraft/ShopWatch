@@ -1,6 +1,12 @@
 package data;
 
-public class Transaction {
+import java.io.Serializable;
+
+public class Transaction  implements Serializable {
+	/**
+	 * Used to dump to file
+	 */
+	private static final long serialVersionUID = -1383452852436874409L;
 	private int id;
 	private String playerName;
 	private double value;

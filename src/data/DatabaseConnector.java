@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import org.bukkit.Bukkit;
 
 public class DatabaseConnector {
-	public static final String SAVE_FILE_DIR = "plugins\\ShopWatch";
+	public static final String SAVE_FILE_DIRECTORY = "plugins\\ShopWatch";
 	public static final String SAVE_FILE_NAME = "SWSaveFile.sav";
 
 	public static void saveTransactions(SWDataClass swDataClass) {
@@ -20,7 +19,7 @@ public class DatabaseConnector {
 
 		try {
 			// Open a file to write to
-			saveFile = new FileOutputStream(SAVE_FILE_DIR + "\\" + SAVE_FILE_NAME);
+			saveFile = new FileOutputStream(SAVE_FILE_DIRECTORY + "\\" + SAVE_FILE_NAME);
 			save = new ObjectOutputStream(saveFile);
 
 			// Save the whole class
@@ -50,7 +49,7 @@ public class DatabaseConnector {
 		// Open file to read from, named SavedObjects.sav.
 		FileInputStream saveFile;
 		try {
-			saveFile = new FileInputStream(SAVE_FILE_DIR + "\\" + SAVE_FILE_NAME);
+			saveFile = new FileInputStream(SAVE_FILE_DIRECTORY + "\\" + SAVE_FILE_NAME);
 			ObjectInputStream save = new ObjectInputStream(saveFile);
 			tempData = (SWDataClass) save.readObject();
 			save.close(); // This also closes saveFile.
