@@ -3,7 +3,7 @@ package brocraft;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedList;
 
 import listeners.*;
 
@@ -82,7 +82,6 @@ public class ShopWatch extends JavaPlugin {
 	 */
 	@Override
 	public void onDisable() {
-		// TODO Insert logic to be performed when the plugin is disabled
 		DatabaseConnector.saveTransactions(swDataClass);
 		getLogger().info("ShopWatch has been disabled!");
 	}
@@ -136,12 +135,24 @@ public class ShopWatch extends JavaPlugin {
 	 * @param value - value of the transaction that is being added
 	 */
 	private void addTransaction(String playerName, double value) {
-		// create a new transaction
-		Transaction t = new Transaction(playerName, value);
-		// add the transaction to the dataClass
-		swDataClass.getTransactions().add(t);
+		if (!playerName.equals("Shop")) {
+			// create a new transaction
+			Transaction t = new Transaction(playerName, value);
+			
+			// add the transaction to the dataClass
+			// check if there is a key for that player
+			if (swDataClass.getTransactions().keySet().contains(playerName)) {
+				swDataClass.getTransactions().get(playerName).add(t);
+			} else {
+				// Player is not yet in the database, add them
+				LinkedList<Transaction> transactionList = new LinkedList<Transaction>();
+				transactionList.add(t);
+				swDataClass.getTransactions().put(playerName, transactionList);
+			}
 
-		DatabaseConnector.saveTransactions(swDataClass);
+			DatabaseConnector.saveTransactions(swDataClass);
+		}
+		
 	}
 
 	/**
@@ -155,20 +166,17 @@ public class ShopWatch extends JavaPlugin {
 	private double getTransactions(String player) {
 		boolean removedRecords = false;
 		// create a running total
-		double runningTotal = 0;
-		// get all the transactions
-		List<Transaction> transactions = swDataClass.getTransactions();
-		// create an iterator for the transactions
-		Iterator<Transaction> transactionIterator = transactions.iterator();
-		while (transactionIterator.hasNext()) {
-			Transaction t = transactionIterator.next();
-			if (t.getPlayerName().equalsIgnoreCase(player)) {
-				runningTotal += t.getValue();
+		int runningTotal = 0;
+		// Check to see if we have any transactions for this player
+		if (swDataClass.getTransactions().keySet().contains(player)) {
+			Iterator<Transaction> transactionIterator = swDataClass.getTransactions().get(player).iterator();
+			while (transactionIterator.hasNext()) {
+				runningTotal += transactionIterator.next().getValue();
 				transactionIterator.remove();
 				removedRecords = true;
 			}
 		}
-		
+				
 		// If we removed any records from the database, we need to save it again
 		if (removedRecords) {
 			DatabaseConnector.saveTransactions(swDataClass);

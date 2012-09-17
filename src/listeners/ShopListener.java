@@ -22,6 +22,8 @@ public class ShopListener implements Listener {
 	public void eventPerformed(TransactionEvent e) {
 		String playerName = e.getOwner();
 		
+//		e.getItem();
+		
 		// Get all of the online players
 		Player[] onlinePlayers = Bukkit.getOnlinePlayers();
 		boolean isOnline = false;

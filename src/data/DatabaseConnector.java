@@ -73,14 +73,16 @@ public class DatabaseConnector {
 		// Close the file.
 
 		// Copy the records from the temporary structure over to the data class
-		swDataClass.getTransactions().clear();
+//		swDataClass.getTransactions().clear();
 
-		Iterator<Transaction> transactionIterator = tempData.getTransactions()
-				.iterator();
-		while (transactionIterator.hasNext()) {
-			swDataClass.getTransactions().add(transactionIterator.next());
-		}
+//		Iterator<Transaction> transactionIterator = tempData.getTransactions()
+//				.iterator();
+//		while (transactionIterator.hasNext()) {
+//			swDataClass.getTransactions().add(transactionIterator.next());
+//		}
 
+		swDataClass = tempData;
+		
 		// All done.
 	}
 }
