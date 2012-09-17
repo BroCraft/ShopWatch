@@ -2,21 +2,20 @@ package data;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class SWDataClass implements Serializable {
 	/**
 	 * Used to dump class to a file
 	 */
 	private static final long serialVersionUID = -1042904485915743989L;
-	private HashMap<String, LinkedList<Transaction>> transactions;
+	private HashMap<String, Merchant> merchants;
 	
 	public SWDataClass() {
-		transactions = new HashMap<String, LinkedList<Transaction>>();
+		merchants = new HashMap<String, Merchant>();
 	}
 
-	public HashMap<String, LinkedList<Transaction>> getTransactions() {
-		return transactions;
+	public HashMap<String, Merchant> getMerchants() {
+		return merchants;
 	}
 
 }

@@ -3,7 +3,6 @@ package brocraft;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import listeners.*;
 
@@ -12,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import data.DatabaseConnector;
+import data.Merchant;
 import data.SWDataClass;
 import data.Transaction;
 
@@ -141,13 +141,13 @@ public class ShopWatch extends JavaPlugin {
 			
 			// add the transaction to the dataClass
 			// check if there is a key for that player
-			if (swDataClass.getTransactions().keySet().contains(playerName)) {
-				swDataClass.getTransactions().get(playerName).add(t);
+			if (swDataClass.getMerchants().keySet().contains(playerName)) {
+				swDataClass.getMerchants().get(playerName).getTransactions().add(t);
 			} else {
 				// Player is not yet in the database, add them
-				LinkedList<Transaction> transactionList = new LinkedList<Transaction>();
-				transactionList.add(t);
-				swDataClass.getTransactions().put(playerName, transactionList);
+				Merchant merchant = new Merchant();
+				merchant.getTransactions().add(t);
+				swDataClass.getMerchants().put(playerName, merchant);
 			}
 
 			DatabaseConnector.saveTransactions(swDataClass);
@@ -168,8 +168,8 @@ public class ShopWatch extends JavaPlugin {
 		// create a running total
 		int runningTotal = 0;
 		// Check to see if we have any transactions for this player
-		if (swDataClass.getTransactions().keySet().contains(player)) {
-			Iterator<Transaction> transactionIterator = swDataClass.getTransactions().get(player).iterator();
+		if (swDataClass.getMerchants().keySet().contains(player)) {
+			Iterator<Transaction> transactionIterator = swDataClass.getMerchants().get(player).getTransactions().iterator();
 			while (transactionIterator.hasNext()) {
 				runningTotal += transactionIterator.next().getValue();
 				transactionIterator.remove();
