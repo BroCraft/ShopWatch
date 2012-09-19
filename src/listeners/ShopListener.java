@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import com.Acrobot.ChestShop.Events.PreTransactionEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent.Type;
 
@@ -20,9 +21,11 @@ public class ShopListener implements Listener {
 
 	@EventHandler
 	public void eventPerformed(TransactionEvent e) {
+		
 		String playerName = e.getOwner();
 		
-//		e.getItem();
+		String itemName = e.getItem().toString();
+		int quantity = e.getItemAmount();
 		
 		// Get all of the online players
 		Player[] onlinePlayers = Bukkit.getOnlinePlayers();
@@ -40,7 +43,7 @@ public class ShopListener implements Listener {
 			if (e.getTransactionType() == Type.SELL) {
 				transactionValue *= -1.0;
 			}
-			parent.sendToDatabase(playerName, transactionValue);
+			parent.sendToDatabase(playerName, itemName, quantity, transactionValue);
 		}
 	}
 }

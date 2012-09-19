@@ -2,6 +2,7 @@ package brocraft;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import listeners.*;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import data.DatabaseConnector;
+import data.ItemReport;
 import data.Merchant;
 import data.SWDataClass;
 import data.Transaction;
@@ -73,7 +75,6 @@ public class ShopWatch extends JavaPlugin {
 
 		// We made it! Output a happy message.
 		getLogger().info("ShopWatch has been enabled!");
-
 	}
 
 	/**
@@ -91,8 +92,8 @@ public class ShopWatch extends JavaPlugin {
 	 * @param shopOwnerName - The owner of the shop
 	 * @param transactionValue - The value of the transaction
 	 */
-	public void sendToDatabase(String shopOwnerName, double transactionValue) {
-		addTransaction(shopOwnerName, transactionValue);
+	public void sendToDatabase(String shopOwnerName, String itemName, int quantity, double transactionValue) {
+		addTransaction(shopOwnerName.toLowerCase(), itemName, quantity, transactionValue);
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class ShopWatch extends JavaPlugin {
 	 * @param player - Name of the player that just logged in
 	 */
 	public void playerLoggedIn(String player) {
-		notifyPlayerOfTransactions(player);
+		notifyPlayerOfTransactions(player.toLowerCase());
 	}
 
 	/**
@@ -113,19 +114,57 @@ public class ShopWatch extends JavaPlugin {
 	 * @param playerName
 	 */
 	private void notifyPlayerOfTransactions(String playerName) {
-		// First, calculate how much the player made since he logged off last
-		double netTransactions = 0;
-		try {
-			netTransactions = this.getTransactions(playerName);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		// get the player
 		Player player = Bukkit.getPlayer(playerName);
-		// tell them how much they made
-		player.sendMessage("Welcome Back " + playerName + "!\nYou have made "
-				+ netTransactions + " dollars while you were offline!");
+		// Check to see if there a merchant file for the player
+		System.out.println("You are: " + playerName + " Merchants: " + swDataClass.getMerchants().keySet().toString());
+		if (swDataClass.getMerchants().keySet().contains(playerName)) {
+			System.out.println("Transactions: " + swDataClass.getMerchants().get(playerName).getTransactions().size());
+			// Check if there are new transactions
+			if (swDataClass.getMerchants().get(playerName).getTransactions().size() != 0) {
+				// Gather the item reports for output
+				HashMap<String, ItemReport> itemReports = new HashMap<String, ItemReport>();
+								
+				Iterator<Transaction> transactionIterator = swDataClass.getMerchants().get(playerName).getTransactions().iterator();
+				while (transactionIterator.hasNext()) {
+					Transaction nextTransaction = transactionIterator.next();
+					String itemName = nextTransaction.getItem();
+					if (itemReports.keySet().contains(itemName)) {
+						itemReports.get(itemName).addTransaction(nextTransaction);
+					} else {
+						itemReports.put(itemName, new ItemReport(nextTransaction));
+					}
+					transactionIterator.remove();
+				}
+				
+				// First, calculate how much the player made since he logged off last
+				double netTransactions = 0;
+				Iterator<String> itemNameIterator = itemReports.keySet().iterator();
+				
+				player.sendMessage("Hello, " + playerName + "! While you were gone your shops were busy!");
+				
+				while (itemNameIterator.hasNext()) {
+					String itemName = itemNameIterator.next();
+					ItemReport itemReport = itemReports.get(itemName);
+					// Output the item report
+					player.sendMessage(itemName + " : " + itemReport.getNetTransaction() + " (" + itemReport.getTransactionCount() + " units)");
+					netTransactions += itemReport.getNetTransaction();
+				}
+				
+				player.sendMessage("Your total net transactions were: " + netTransactions + " dollars.");
+				
+			} else {
+				// No new transactions
+				player.sendMessage("No shop activity to report. Happy Crafting!");
+			}
+		} else {
+			// Create the merchant file for the player
+			swDataClass.getMerchants().put(playerName, new Merchant());
+			getLogger().info("Added " + playerName + " merchant");
+			// Welcome the player to the new shop mod?
+			player.sendMessage("Your shops in BroCraft just got an upgrade! Whenever you log in you will see a report from your shop from when you were offline!");
+			
+		}
 	}
 
 	/**
@@ -134,11 +173,12 @@ public class ShopWatch extends JavaPlugin {
 	 * @param playerName - name of the player who owns the shop
 	 * @param value - value of the transaction that is being added
 	 */
-	private void addTransaction(String playerName, double value) {
-		if (!playerName.equals("Shop")) {
+	private void addTransaction(String playerName, String itemName, int quanitity, double value) {
+		
+		if (!playerName.equalsIgnoreCase("Shop")) {
 			// create a new transaction
-			Transaction t = new Transaction(playerName, value);
-			
+			Transaction t = new Transaction(playerName, itemName, quanitity, value);
+
 			// add the transaction to the dataClass
 			// check if there is a key for that player
 			if (swDataClass.getMerchants().keySet().contains(playerName)) {
@@ -149,39 +189,41 @@ public class ShopWatch extends JavaPlugin {
 				merchant.getTransactions().add(t);
 				swDataClass.getMerchants().put(playerName, merchant);
 			}
+			
 
 			DatabaseConnector.saveTransactions(swDataClass);
 		}
-		
+
 	}
 
-	/**
-	 * Totals up all of the transactions that have occurred since the players
-	 * last login
-	 * 
-	 * @param player
-	 * @return the total value of all transactions that occurred while the player
-	 *         was logged off
-	 */
-	private double getTransactions(String player) {
-		boolean removedRecords = false;
-		// create a running total
-		int runningTotal = 0;
-		// Check to see if we have any transactions for this player
-		if (swDataClass.getMerchants().keySet().contains(player)) {
-			Iterator<Transaction> transactionIterator = swDataClass.getMerchants().get(player).getTransactions().iterator();
-			while (transactionIterator.hasNext()) {
-				runningTotal += transactionIterator.next().getValue();
-				transactionIterator.remove();
-				removedRecords = true;
-			}
-		}
-				
-		// If we removed any records from the database, we need to save it again
-		if (removedRecords) {
-			DatabaseConnector.saveTransactions(swDataClass);
-		}
-		return runningTotal;
-	}
+//	/**
+//	 * Totals up all of the transactions that have occurred since the players
+//	 * last login
+//	 * 
+//	 * @param player
+//	 * @return the total value of all transactions that occurred while the player
+//	 *         was logged off
+//	 */
+//	private HashMap<String, ItemReport> getItemReports(String player) {
+//		boolean removedRecords = false;
+//		HashMap<String, ItemReport> itemReports = new HashMap<String, ItemReport>();
+//		
+//		// Check to see if we a merchant object for this player
+//		if (swDataClass.getMerchants().keySet().contains(player)) {
+//			
+//			Iterator<Transaction> transactionIterator = swDataClass.getMerchants().get(player).getTransactions().iterator();
+//			while (transactionIterator.hasNext()) {
+////				runningTotal += transactionIterator.next().getValue();
+//				transactionIterator.remove();
+//				removedRecords = true;
+//			}
+//		}
+//
+//		// If we removed any records from the database, we need to save it again
+//		if (removedRecords) {
+//			DatabaseConnector.saveTransactions(swDataClass);
+//		}
+//		return itemReports;
+//	}
 
 }

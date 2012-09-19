@@ -10,12 +10,13 @@ public class Transaction  implements Serializable {
 	private int id;
 	private String playerName;
 	private double value;
-	private boolean read;
+	private String item;
+	private int quantity;
 	
-	public Transaction(String playerName, double value) {
+	public Transaction(String playerName, String item, int quantity, double value) {
 		this.playerName = playerName;
 		this.value = value;
-		this.read = false;
+		this.setQuantity(quantity);
 	}
 	/**
 	 * @return the playerName
@@ -54,15 +55,27 @@ public class Transaction  implements Serializable {
 		this.id = id;
 	}
 	/**
-	 * @return the read
+	 * @return the item
 	 */
-	public boolean isRead() {
-		return read;
+	public String getItem() {
+		return item;
 	}
 	/**
-	 * @param read the read to set
+	 * @param item the item to set
 	 */
-	public void setRead(boolean read) {
-		this.read = read;
+	public void setItem(String item) {
+		this.item = item;
+	}
+	/**
+	 * @return the quantity
+	 */
+	public int getQuantity() {
+		return quantity;
+	}
+	/**
+	 * @param quantity the quantity to set
+	 */
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 }
