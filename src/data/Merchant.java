@@ -10,11 +10,11 @@ public class Merchant implements Serializable {
 	 */
 	private static final long serialVersionUID = 5544922801001160326L;
 	private List<Transaction> transactions;
-	private List<String> emptyShops;
+	private List<Shop> shops;
 	
 	public Merchant() {
 		this.transactions = new LinkedList<Transaction>();
-		this.emptyShops = new LinkedList<String>();
+		this.shops = new LinkedList<Shop>();
 	}
 	
 	/**
@@ -30,18 +30,17 @@ public class Merchant implements Serializable {
 		this.transactions = transactions;
 	}
 	/**
-	 * @return the emptyShops
+	 * @return the emptyShops, which is an empty list if no shops are empty
 	 */
-	public List<String> getEmptyShops() {
+	public List<Shop> getEmptyShops() {
+		List<Shop> emptyShops = new LinkedList<Shop>();
+		for(Shop s: shops){
+			if(s.isEmpty()){
+				emptyShops.add(s);
+			}
+		}
 		return emptyShops;
 	}
-	/**
-	 * @param emptyShops the emptyShops to set
-	 */
-	public void setEmptyShops(List<String> emptyShops) {
-		this.emptyShops = emptyShops;
-	}
-	
 	
 
 }

@@ -6,7 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
+import com.Acrobot.ChestShop.Events.PreTransactionEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent.Type;
 
@@ -21,7 +23,12 @@ public class ShopListener implements Listener {
 	@EventHandler
 	public void eventPerformed(TransactionEvent e) {
 		String playerName = e.getOwner();
-		
+		ItemStack item = e.getItem();
+		if(e.getContainer().amount(item) < e.getItemAmount()){
+			//THE SHOP IS EMPTY
+			//DO IMPORTANT STUFF
+			//DO IT NOW!
+		}
 //		e.getItem();
 		
 		// Get all of the online players
